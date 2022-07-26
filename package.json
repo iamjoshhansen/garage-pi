@@ -1,0 +1,38 @@
+{
+  "name": "garage-pi",
+  "version": "1.0.0",
+  "description": "Node package for the Raspberry Pi, running sprinklers, lights, etc",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=10.13",
+    "npm": ">=6.4.1"
+  },
+  "scripts": {
+    "start:dev": "node --require source-map-support/register $NODE_DEBUG_OPTION ./dist/",
+    "start:prod": "node ./dist/",
+    "start": "tsc-watch --onSuccess \"npm run start:dev\"",
+    "build": "tsc"
+  },
+  "keywords": [
+    "Raspberry Pi",
+    "Smart Home",
+    "IO",
+    "WebSockets"
+  ],
+  "author": "Joshua Hansen <iamjoshhansen@gmail.com>",
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.5",
+    "@types/node": "^18.0.3",
+    "@types/onoff": "^4.1.0",
+    "tsc-watch": "^5.0.3",
+    "typescript": "^4.7.4"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "onoff": "^6.0.3",
+    "rxjs": "^7.5.6",
+    "source-map-support": "^0.5.21",
+    "yaml": "^2.1.1"
+  }
+}
