@@ -29,6 +29,8 @@ async function main() {
   //   pinConfig: env.zonePins,
   //   events: finalEvents,
   // });
+
+  console.log(`Ready!`);
 }
 
 void main();
