@@ -1,19 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { Gpio } from './onoff-env';
 
-// const pins: OutputPin[] = [];
-
-// process.on('SIGINT', () => {
-//   pins.forEach(pin => {
-//     console.log({
-//       msg: `unexporting pin`,
-//       pin: pin.id,
-//     });
-//     pin.unexport();
-//     process.exit(0);
-//   });
-// });
-
 export const registeredOutputPins = new Set<OutputPin>();
 
 const ONVALUE = 1;
@@ -21,7 +8,7 @@ const ONVALUE = 1;
 export class OutputPin {
   private pin = new Gpio(this.id, 'out');
   private stateSource = new BehaviorSubject<boolean>(
-    this.pin.readSync() === ONVALUE,
+    this.pin.readSync() !== ONVALUE,
   );
   public state$ = this.stateSource.asObservable();
 
