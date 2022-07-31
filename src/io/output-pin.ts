@@ -46,7 +46,7 @@ export class OutputPin {
 
   write(val: boolean): Promise<void> {
     return new Promise((resolve, reject) => {
-      // console.log(`Writing to pin ${this.id}: ${val}`);
+      console.log(`[${this.id}] ${val}`);
       if (this.accessible) {
         // console.log(`  Accessible!`);
         this.pin.write(val ? 0 : 1, (err: Error) => {
@@ -55,12 +55,13 @@ export class OutputPin {
             // console.log(`  `, err);
             reject(err);
           } else {
-            // console.log(`  Done: ${val}`);
+            // console.log(`  [${this.id}] Done: ${val}`);
             this.stateSource.next(val);
             resolve();
           }
         });
       } else {
+        // console.log(`  [${this.id}] Done: ${val}`);
         resolve();
       }
     });
