@@ -1,18 +1,20 @@
 import { BehaviorSubject } from 'rxjs';
 import { Gpio } from './onoff-env';
 
-const pins: OutputPin[] = [];
+// const pins: OutputPin[] = [];
 
-process.on('SIGINT', () => {
-  pins.forEach(pin => {
-    console.log({
-      msg: `unexporting pin`,
-      pin: pin.id,
-    });
-    pin.unexport();
-    process.exit(0);
-  });
-});
+// process.on('SIGINT', () => {
+//   pins.forEach(pin => {
+//     console.log({
+//       msg: `unexporting pin`,
+//       pin: pin.id,
+//     });
+//     pin.unexport();
+//     process.exit(0);
+//   });
+// });
+
+export const registeredOutputPins = new Set<OutputPin>();
 
 const ONVALUE = 1;
 
@@ -26,7 +28,8 @@ export class OutputPin {
   private accessible = Gpio.accessible;
 
   constructor(readonly id: number) {
-    pins.push(this);
+    // pins.push(this);
+    registeredOutputPins.add(this);
   }
 
   unexport() {

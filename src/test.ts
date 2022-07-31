@@ -1,43 +1,34 @@
 import { interval } from 'rxjs';
 import { env } from './env';
-import { InputPinEmitter } from './input-pin-emitter';
 import { OutputPin } from './io';
-import { Zone } from './scheduler';
 
 async function main() {
-  const inputs = new InputPinEmitter(env.testPins);
+  const sidewalk = new OutputPin(env.zonePins.Sidewalk);
+  const frontYard = new OutputPin(env.zonePins.FrontYard);
+  const backNear = new OutputPin(env.zonePins.BackNear);
+  const backFar = new OutputPin(env.zonePins.BackFar);
+  const drip = new OutputPin(env.zonePins.Drip);
+  const gardenNorth = new OutputPin(env.zonePins.GardenNorth);
+  const gardenEast = new OutputPin(env.zonePins.GardenEast);
+  const active = new OutputPin(env.zonePins.active);
 
-  const switchA = inputs.getPinEvents('switchA' as Zone);
-  const switchB = inputs.getPinEvents('switchB' as Zone);
-  const buttonIn = inputs.getPinEvents('buttonIn' as Zone);
+  const pins = [
+    sidewalk,
+    frontYard,
+    backNear,
+    backFar,
+    drip,
+    gardenNorth,
+    gardenEast,
+    active,
+  ];
 
-  const out = new OutputPin(env.testPins.buttonOut);
-
-  switchA.subscribe(active => {
-    console.log(`Switch A: ${active}`);
+  interval(1000).subscribe(async i => {
+    const pin = pins[i % pins.length];
+    pin.write(true);
+    await new Promise(resolve => setTimeout(resolve, 250));
+    pin.write(false);
   });
-
-  switchB.subscribe(active => {
-    console.log(`Switch B: ${active}`);
-    out.write(active);
-  });
-
-  out.state$.subscribe(active => {
-    console.log(`LED: ${active}`);
-  });
-
-  interval(1000).subscribe(i => {
-    out.write(i % 2 === 0);
-  });
-
-  buttonIn.subscribe(active => {
-    console.log(`Button: ${active}`);
-  });
-
-  // new OutputPinController({
-  //   pinConfig: env.zonePins,
-  //   events: finalEvents,
-  // });
 
   console.log(`Ready!`);
 }

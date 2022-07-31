@@ -2,18 +2,20 @@ import { BehaviorSubject } from 'rxjs';
 import { Gpio } from './onoff-env';
 import { Gpio as GpioType, BinaryValue } from 'onoff';
 
-const pins: InputPin[] = [];
+// const pins: InputPin[] = [];
 
-process.on('SIGINT', () => {
-  pins.forEach(pin => {
-    console.log({
-      msg: `unexporting pin`,
-      pin: pin.id,
-    });
-    pin.unexport();
-    process.exit(0);
-  });
-});
+export const registeredInputPins = new Set<InputPin>();
+
+// process.on('SIGINT', () => {
+//   pins.forEach(pin => {
+//     console.log({
+//       msg: `unexporting pin`,
+//       pin: pin.id,
+//     });
+//     pin.unexport();
+//     process.exit(0);
+//   });
+// });
 
 const ONVALUE: BinaryValue = 1;
 
@@ -39,7 +41,8 @@ export class InputPin {
       }
     });
 
-    pins.push(this);
+    // pins.push(this);
+    registeredInputPins.add(this);
   }
 
   unexport() {
