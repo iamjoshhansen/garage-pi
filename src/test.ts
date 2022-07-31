@@ -26,8 +26,8 @@ async function main() {
     console.log(`LED: ${active}`);
   });
 
-  interval(1000).subscribe(() => {
-    out.toggle();
+  interval(1000).subscribe(i => {
+    out.write(i % 2 === 0);
   });
 
   buttonIn.subscribe(active => {
