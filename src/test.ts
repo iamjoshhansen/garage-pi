@@ -1,3 +1,4 @@
+import { interval } from 'rxjs';
 import { env } from './env';
 import { InputPinEmitter } from './input-pin-emitter';
 import { OutputPin } from './io';
@@ -19,6 +20,14 @@ async function main() {
   switchB.subscribe(active => {
     console.log(`Switch B: ${active}`);
     out.write(active);
+  });
+
+  out.state$.subscribe(active => {
+    console.log(`LED: ${active}`);
+  });
+
+  interval(1000).subscribe(() => {
+    out.toggle();
   });
 
   buttonIn.subscribe(active => {

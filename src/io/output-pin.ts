@@ -43,16 +43,16 @@ export class OutputPin {
 
   write(val: boolean): Promise<void> {
     return new Promise((resolve, reject) => {
-      console.log(`Writing to pin ${this.id}: ${val}`);
+      // console.log(`Writing to pin ${this.id}: ${val}`);
       if (this.accessible) {
-        console.log(`  Accessible!`);
+        // console.log(`  Accessible!`);
         this.pin.write(val ? 0 : 1, (err: Error) => {
           if (err) {
-            console.log(`  Nope!`);
-            console.log(`  `, err);
+            // console.log(`  Nope!`);
+            // console.log(`  `, err);
             reject(err);
           } else {
-            console.log(`  Done: ${val}`);
+            // console.log(`  Done: ${val}`);
             this.stateSource.next(val);
             resolve();
           }
@@ -61,6 +61,11 @@ export class OutputPin {
         resolve();
       }
     });
+  }
+
+  async toggle() {
+    const active = await this.read();
+    this.write(!active);
   }
 
   async read(): Promise<boolean> {
