@@ -1,36 +1,44 @@
-import { interval } from 'rxjs';
+import { of, Subject } from 'rxjs';
+
 import { env } from './env';
-import { OutputPin } from './io';
+import { OutputPinController } from './output-pin-controller';
+import { LocalScheduleGetter } from './schedule-getter';
+import { ScheduleObserver } from './schedule-observer';
 
-async function main() {
-  const sidewalk = new OutputPin(env.zonePins.Sidewalk);
-  const frontYard = new OutputPin(env.zonePins.FrontYard);
-  const backNear = new OutputPin(env.zonePins.BackNear);
-  const backFar = new OutputPin(env.zonePins.BackFar);
-  const drip = new OutputPin(env.zonePins.Drip);
-  const gardenNorth = new OutputPin(env.zonePins.GardenNorth);
-  const gardenEast = new OutputPin(env.zonePins.GardenEast);
-  const active = new OutputPin(env.zonePins.active);
+async function run() {
+  const scheduleGetter = new LocalScheduleGetter();
+  const schedules = of(await scheduleGetter.getSchedules());
+  const clock = new Subject<Date>();
 
-  const pins = [
-    sidewalk,
-    frontYard,
-    backNear,
-    backFar,
-    drip,
-    gardenNorth,
-    gardenEast,
-    active,
-  ];
-
-  interval(1000).subscribe(async i => {
-    const pin = pins[i % pins.length];
-    pin.write(true);
-    await new Promise(resolve => setTimeout(resolve, 250));
-    pin.write(false);
+  const scheduleObserver = new ScheduleObserver({
+    schedules,
+    clock,
   });
 
-  console.log(`Ready!`);
+  new OutputPinController({
+    pinConfig: env.zonePins,
+    events: scheduleObserver.events,
+  });
+
+  schedules.subscribe(async ss => {
+    const now = new Date('2022/08/01');
+    const [h, m] = ss[0].time.split(':').map(x => parseInt(x, 10));
+    now.setHours(h);
+    now.setMinutes(m);
+    now.setSeconds(0);
+    now.setMilliseconds(0);
+
+    while (now.getHours() < 3) {
+      now.setSeconds(now.getSeconds() + 1);
+      console.log(`${now.toTimeString().substring(0, 8)}`);
+      clock.next(now);
+      await new Promise<void>(resolve =>
+        setTimeout(() => {
+          resolve();
+        }, 5),
+      );
+    }
+  });
 }
 
-void main();
+void run();
