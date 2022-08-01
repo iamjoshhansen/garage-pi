@@ -8,7 +8,7 @@ const ONVALUE = 1;
 export class OutputPin {
   private pin = new Gpio(this.id, 'out');
   private stateSource = new BehaviorSubject<boolean>(
-    this.pin.readSync() !== ONVALUE,
+    this.pin.readSync() === ONVALUE,
   );
   public state$ = this.stateSource.asObservable();
 
@@ -17,6 +17,7 @@ export class OutputPin {
   constructor(readonly id: number) {
     // pins.push(this);
     registeredOutputPins.add(this);
+    this.write(this.state);
   }
 
   unexport() {
