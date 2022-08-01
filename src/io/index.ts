@@ -6,22 +6,27 @@ export * from './onoff-env';
 export * from './onoff-fake';
 export * from './output-pin';
 
-process.on('SIGINT', () => {
-  registeredInputPins.forEach(pin => {
-    console.log({
-      msg: `unexporting input pin`,
-      pin: pin.id,
-    });
-    pin.unexport();
-  });
+let hasSetUpExport = false;
 
-  registeredOutputPins.forEach(pin => {
-    console.log({
-      msg: `unexporting output pin`,
-      pin: pin.id,
-    });
-    pin.unexport();
-  });
+if (!hasSetUpExport) {
+  hasSetUpExport = true;
 
-  process.exit(0);
-});
+  process.on('SIGINT', async () => {
+    console.log(`UNEXPORTING`);
+
+    console.log('\nInputs:');
+    for (const pin of registeredInputPins) {
+      console.log(`- ${pin.id}`);
+      pin.unexport();
+    }
+
+    console.log('\nOutputs:');
+    for (const pin of registeredOutputPins) {
+      console.log(`- ${pin.id}`);
+      await pin.write(false);
+      pin.unexport();
+    }
+
+    process.exit(0);
+  });
+}
