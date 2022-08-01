@@ -1,4 +1,4 @@
-import { Schedule, Zone } from './scheduler';
+import { Schedule, ScheduleEvent } from './scheduler';
 
 export abstract class ScheduleGetter {
   abstract getSchedules(): Promise<Schedule[]>;
@@ -16,19 +16,19 @@ export class LocalScheduleGetter implements ScheduleGetter {
           gap: 3,
           sequence: [
             {
-              zone: 'Sidewalk' as Zone,
+              event: 'Sidewalk' as ScheduleEvent,
               duration: 6,
             },
             {
-              zone: 'FrontYard' as Zone,
+              event: 'FrontYard' as ScheduleEvent,
               duration: 8,
             },
             {
-              zone: 'BackNear' as Zone,
+              event: 'BackNear' as ScheduleEvent,
               duration: 7,
             },
             {
-              zone: 'BackFar' as Zone,
+              event: 'BackFar' as ScheduleEvent,
               duration: 8,
             },
           ],

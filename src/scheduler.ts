@@ -14,7 +14,7 @@ export type TaskDuration = number & { __brand: 'TaskDuration' };
 export type TaskStart = number & { __brand: 'TaskStart' };
 export type TaskTimeString = string & { __brand: 'TaskTimeString' };
 
-export type Zone = string & { __brand: 'Zone' };
+export type ScheduleEvent = string & { __brand: 'ScheduleEvent' };
 
 export interface Schedule {
   dows: string;
@@ -23,7 +23,7 @@ export interface Schedule {
   roundCount: number;
   roundDelay: number;
   sequence: {
-    zone: Zone;
+    event: ScheduleEvent;
     duration: number;
   }[];
 }
@@ -31,7 +31,7 @@ export interface Schedule {
 export type DOW = 'U' | 'M' | 'T' | 'W' | 'R' | 'F' | 'S';
 
 export interface SprinklerEvent {
-  zone: Zone | string;
+  event: ScheduleEvent;
   dow: DOW;
   start: number;
   duration: number;
@@ -70,7 +70,7 @@ export function* sprinklerEvents(
           const duration = ev.duration * 60 - schedule.gap;
           yield {
             dow,
-            zone: ev.zone,
+            event: ev.event,
             start: time,
             duration,
             end: time + duration,
@@ -79,7 +79,7 @@ export function* sprinklerEvents(
 
           yield {
             dow,
-            zone: 'zone delay',
+            event: 'zone delay' as ScheduleEvent,
             start: time,
             duration: schedule.gap,
             end: time + schedule.gap,
@@ -90,7 +90,7 @@ export function* sprinklerEvents(
         const duration = schedule.roundDelay * 60;
         yield {
           dow,
-          zone: 'round delay',
+          event: 'round delay' as ScheduleEvent,
           start: time,
           duration,
           end: time + duration,
@@ -101,17 +101,20 @@ export function* sprinklerEvents(
   }
 }
 
-export function activeZones(date = new Date(), schedule: Schedule): Zone[] {
-  const zones: Zone[] = [];
-  const dow = dateToDOW(date);
+export function activeEvents(
+  date = new Date(),
+  schedule: Schedule,
+): ScheduleEvent[] {
+  const events: ScheduleEvent[] = [];
+  const targetDow = dateToDOW(date);
   const time = timeToNumber(dateToTime(date));
   [...sprinklerEvents(schedule)]
-    .filter(event => {
-      if (event.zone.toLowerCase().includes('delay')) {
+    .filter(({ event, dow, start, end }) => {
+      if (event.toLowerCase().includes('delay')) {
         return false;
       }
-      return event.dow == dow && event.start <= time && event.end > time;
+      return targetDow == dow && start <= time && end > time;
     })
-    .forEach(event => zones.push(event.zone as Zone));
-  return zones;
+    .forEach(({ event }) => events.push(event));
+  return events;
 }

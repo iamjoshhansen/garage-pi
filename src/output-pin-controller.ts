@@ -15,14 +15,14 @@ export class OutputPinController {
       console.log(`Registered ${pin.toString().padStart(2)}: ${key}`);
     }
 
-    composition.events.subscribe(({ zone, active }) => {
-      const pin = pins[zone];
+    composition.events.subscribe(({ event, active }) => {
+      const pin = pins[event];
       if (!pin) {
-        console.warn(`Recieved unknown pin key: '${zone}' (${active})`);
+        console.warn(`Recieved unknown pin key: '${event}' (${active})`);
         return;
       }
 
-      console.log(`${active ? '🟩' : '🟥'} ${zone}`);
+      console.log(`${active ? '🟩' : '🟥'} ${event}`);
       pin.write(active);
     });
   }

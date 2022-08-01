@@ -7,17 +7,18 @@ import {
   takeUntil,
 } from 'rxjs';
 
-import { activeZones, Schedule, Zone } from './scheduler';
+import { activeEvents, Schedule, ScheduleEvent } from './scheduler';
 
 export interface ActivationEvent {
-  zone: Zone;
+  event: ScheduleEvent;
   active: boolean;
 }
 
 export class ScheduleObserver {
   private readonly stopped = new Subject<void>();
 
-  public events = new Subject<ActivationEvent>();
+  public readonly events = new Subject<ActivationEvent>();
+  private readonly eventSubjects: Record<string, BehaviorSubject<boolean>> = {};
 
   constructor(composition: {
     schedules: Observable<Schedule[]>;
@@ -26,47 +27,43 @@ export class ScheduleObserver {
     combineLatest([composition.schedules, composition.clock])
       .pipe(takeUntil(this.stopped))
       .subscribe(([schedules, date]) => {
-        const zones = new Set<Zone>();
+        const events = new Set<ScheduleEvent>();
         for (const schedule of schedules) {
-          activeZones(date, schedule).forEach(zone => zones.add(zone));
+          activeEvents(date, schedule).forEach(event => events.add(event));
         }
 
-        // console.log([...zones]);
-
         // update all existing
-        Object.keys(this.zoneSubjects).forEach(key => {
-          const zone = key as Zone;
-          const isActive = zones.has(zone);
-          this.zoneSubjects[zone].next(isActive);
-          zones.delete(zone);
+        Object.keys(this.eventSubjects).forEach(key => {
+          const event = key as ScheduleEvent;
+          const isActive = events.has(event);
+          this.eventSubjects[event].next(isActive);
+          events.delete(event);
         });
 
-        // create new zones
-        zones.forEach(zone => {
-          this.getOrCreateZoneSubject(zone, true);
+        // create new events
+        events.forEach(event => {
+          this.getOrCreateEventSubject(event, true);
         });
       });
   }
 
-  zoneObservable(zone: Zone): Observable<boolean> {
-    return this.getOrCreateZoneSubject(zone).pipe(distinctUntilChanged());
+  eventObservable(event: ScheduleEvent): Observable<boolean> {
+    return this.getOrCreateEventSubject(event).pipe(distinctUntilChanged());
   }
 
-  private readonly zoneSubjects: Record<string, BehaviorSubject<boolean>> = {};
-
-  private getOrCreateZoneSubject(
-    zone: Zone,
+  private getOrCreateEventSubject(
+    event: ScheduleEvent,
     initialValue = false,
   ): BehaviorSubject<boolean> {
-    if (!(zone in this.zoneSubjects)) {
-      this.zoneSubjects[zone] = new BehaviorSubject<boolean>(initialValue);
+    if (!(event in this.eventSubjects)) {
+      this.eventSubjects[event] = new BehaviorSubject<boolean>(initialValue);
     }
-    const subject = this.zoneSubjects[zone];
+    const subject = this.eventSubjects[event];
 
     // bind to allEvents
     subject
       .pipe(takeUntil(this.stopped), distinctUntilChanged())
-      .subscribe(active => this.events.next({ zone, active }));
+      .subscribe(active => this.events.next({ event, active }));
 
     return subject;
   }
