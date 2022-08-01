@@ -17,16 +17,16 @@ async function run() {
 
   while (true) {
     console.log(`All on`);
-    pinA.write(true);
-    pinB.write(true);
-    pinC.write(true);
+    pinA.write(0);
+    pinB.write(0);
+    pinC.write(0);
 
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     console.log(`All off`);
-    pinA.write(false);
-    pinB.write(false);
-    pinC.write(false);
+    pinA.write(1);
+    pinB.write(1);
+    pinC.write(1);
 
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
