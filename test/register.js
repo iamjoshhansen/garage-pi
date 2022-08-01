@@ -6,11 +6,11 @@ const pinC = new Gpio(18, 'high');
 
 process.on('SIGINT', () => {
   try {
-    pinA.writeSync(0);
+    pinA.writeSync(1);
     pinA.unexport();
-    pinB.writeSync(0);
+    pinB.writeSync(1);
     pinB.unexport();
-    pinC.writeSync(0);
+    pinC.writeSync(1);
     pinC.unexport();
   } catch {}
   process.exit(0);
