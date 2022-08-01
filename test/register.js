@@ -5,9 +5,15 @@ const pinB = new Gpio(17, 'high');
 const pinC = new Gpio(18, 'high');
 
 process.on('SIGINT', () => {
-  pinA.unexport();
-  pinB.unexport();
-  pinC.unexport();
+  try {
+    pinA.writeSync(0);
+    pinA.unexport();
+    pinB.writeSync(0);
+    pinB.unexport();
+    pinC.writeSync(0);
+    pinC.unexport();
+  } catch {}
+  process.exit(0);
 });
 
 async function run() {
