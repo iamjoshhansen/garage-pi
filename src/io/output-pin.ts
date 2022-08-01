@@ -11,7 +11,7 @@ export class OutputPin {
   private accessible = Gpio.accessible;
 
   constructor(readonly id: number, initial = false) {
-    this.pin = new Gpio(this.id, initial ? 'high' : 'low');
+    this.pin = new Gpio(this.id, initial ? 'low' : 'high');
 
     this.stateSource = new BehaviorSubject<boolean>(initial);
     this.state$ = this.stateSource.asObservable();
