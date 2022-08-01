@@ -1,23 +1,24 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Gpio } from './onoff-env';
 
 export const registeredOutputPins = new Set<OutputPin>();
 
-const ONVALUE = 1;
-
 export class OutputPin {
-  private pin = new Gpio(this.id, 'out');
-  private stateSource = new BehaviorSubject<boolean>(
-    this.pin.readSync() === ONVALUE,
-  );
-  public state$ = this.stateSource.asObservable();
+  private pin: typeof Gpio;
+  private stateSource: BehaviorSubject<boolean>;
+  public state$: Observable<boolean>;
 
   private accessible = Gpio.accessible;
 
-  constructor(readonly id: number) {
+  constructor(readonly id: number, initial = false) {
+    this.pin = new Gpio(this.id, initial ? 'high' : 'low');
+
+    this.stateSource = new BehaviorSubject<boolean>(initial);
+    this.state$ = this.stateSource.asObservable();
+
     // pins.push(this);
     registeredOutputPins.add(this);
-    this.write(this.state);
+    // this.write(this.state);
   }
 
   unexport() {
