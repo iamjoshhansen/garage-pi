@@ -17,7 +17,7 @@ export interface ActivationEvent {
 export class ScheduleObserver {
   private readonly stopped = new Subject<void>();
 
-  public readonly events = new Subject<ActivationEvent>();
+  public readonly events$ = new Subject<ActivationEvent>();
   private readonly eventSubjects: Record<string, BehaviorSubject<boolean>> = {};
 
   constructor(composition: {
@@ -63,7 +63,7 @@ export class ScheduleObserver {
     // bind to allEvents
     subject
       .pipe(takeUntil(this.stopped), distinctUntilChanged())
-      .subscribe(active => this.events.next({ event, active }));
+      .subscribe(active => this.events$.next({ event, active }));
 
     return subject;
   }

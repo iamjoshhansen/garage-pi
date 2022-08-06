@@ -8,13 +8,6 @@ export interface Env {
     http: number;
   };
   zonePins: Record<string, number>;
-  manualInputPins: Record<string, number>;
-  testPins: {
-    switchA: number;
-    switchB: number;
-    buttonIn: number;
-    buttonOut: number;
-  };
 }
 
 const envString = readFileSync('./.env.yml').toString();

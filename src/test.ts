@@ -17,7 +17,7 @@ async function run() {
 
   new OutputPinController({
     pinConfig: env.zonePins,
-    events: scheduleObserver.events,
+    events: scheduleObserver.events$,
   });
 
   schedules.subscribe(async ss => {
