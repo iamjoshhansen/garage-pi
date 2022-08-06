@@ -9,7 +9,12 @@ import { LocalScheduleGetter } from './schedule-getter';
 import { ScheduleObserver } from './schedule-observer';
 
 const server = require('http').createServer();
-const ioServer = require('socket.io')(server);
+const ioServer = require('socket.io')(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
 
 async function main() {
   server.listen(env.port.io);
